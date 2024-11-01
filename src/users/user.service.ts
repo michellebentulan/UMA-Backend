@@ -45,6 +45,16 @@ export class UserService {
     return updatedUser;
   }
 
+  async updateProfileImage(userId: number, imagePath: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.profile_image = imagePath;
+    return this.userRepository.save(user);
+  }
+
   async login(phoneNumber: string, password: string): Promise<any> {
     const user = await this.userRepository.findOne({
       where: { phone_number: phoneNumber },
