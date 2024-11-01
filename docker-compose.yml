@@ -1,0 +1,18 @@
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: uma_db
+      MYSQL_USER: uma
+      MYSQL_PASSWORD: uma_password
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./mariadb-data:/var/lib/mysql
+    networks:
+      - uma_network
+
+networks:
+  uma_network:
+    driver: bridge
