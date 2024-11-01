@@ -6,9 +6,15 @@ import {
   Put,
   Param,
   Delete,
+  UploadedFile,
+  UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('users')
 export class UserController {
@@ -50,5 +56,39 @@ export class UserController {
     console.log('Logging out user with ID:', userId);
     await this.userService.logout(userId);
     return { message: 'Logout successful' }; // Confirm successful logout
+  }
+
+  @Post('upload-profile-image/:id')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/profile-images',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `profile-${uniqueSuffix}${ext}`);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+          return callback(
+            new BadRequestException('Only image files are allowed!'),
+            false,
+          );
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  async uploadProfileImage(
+    @Param('id') userId: number,
+    @UploadedFile() file: any,
+  ) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+    console.log('Uploaded file:', file);
+    return this.userService.updateProfileImage(userId, file.filename);
   }
 }
