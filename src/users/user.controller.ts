@@ -45,6 +45,11 @@ export class UserController {
     return this.userService.login(phoneNumber, password);
   }
 
+  @Get(':id')
+  async getUserProfile(@Param('id') id: number) {
+    return this.userService.getUserProfile(id);
+  }
+
   @Get()
   async getAllUsers() {
     return this.userService.getAllUsers(); // Call the service method to fetch users

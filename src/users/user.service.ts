@@ -79,7 +79,7 @@ export class UserService {
 
     await this.sessionRepository.save(session);
 
-    return { message: 'Login successful', sessionToken }; // Return session token
+    return { message: 'Login successful', sessionToken, userId: user.id }; // Return session token
   }
 
   async logout(userId: number): Promise<void> {
@@ -108,6 +108,15 @@ export class UserService {
 
     session.expires_at = new Date(Date.now() + 3600 * 1000); // Extend session by 1 hour
     return this.sessionRepository.save(session);
+  }
+
+  async getUserProfile(userId: number): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    console.log('Fetched user profile:', user);
+    return user;
   }
 
   async getAllUsers(): Promise<User[]> {
