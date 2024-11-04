@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { UserModule } from './users/user.module'; // Adjust the path as necessary
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path'; // Import join to handle paths
@@ -20,6 +21,7 @@ import { join } from 'path'; // Import join to handle paths
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // Set to false in production
     }),
+    ScheduleModule.forRoot(),
     UserModule,
   ],
 })
