@@ -9,6 +9,7 @@ import { User } from './user.entity';
 import { Session } from '../sessions/session.entity';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import { LessThan } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -21,13 +22,35 @@ export class UserService {
   ) {}
 
   // Step 1: Create Account
-  async createAccount(userData: Partial<User>): Promise<User> {
+  // async createAccount(userData: Partial<User>): Promise<User> {
+  //   const hashedPassword = await bcrypt.hash(userData.password, 10);
+  //   const user = this.userRepository.create({
+  //     ...userData,
+  //     password: hashedPassword,
+  //   });
+  //   return this.userRepository.save(user);
+  // }
+
+  async createAccount(
+    userData: Partial<User>,
+  ): Promise<{ user: User; sessionToken: string }> {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
     });
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+
+    // Create session token and save session after account creation
+    const sessionToken = uuidv4();
+    const session = this.sessionRepository.create({
+      user_id: savedUser.id,
+      session_token: sessionToken,
+      expires_at: new Date(Date.now() + 3600 * 1000), // 1-hour session expiration
+    });
+    await this.sessionRepository.save(session);
+
+    return { user: savedUser, sessionToken };
   }
 
   // Step 2: Complete Profile
@@ -35,13 +58,17 @@ export class UserService {
     userId: number,
     profileData: Partial<User>,
   ): Promise<User> {
+    console.log('Attempting to update profile for user ID:', userId);
+
     await this.userRepository.update(userId, profileData);
     const updatedUser = await this.userRepository.findOne({
       where: { id: userId },
     });
     if (!updatedUser) {
+      console.error('User not found for ID:', userId);
       throw new NotFoundException('User not found');
     }
+    console.log('Updated user profile:', updatedUser); // Log updated user details
     return updatedUser;
   }
 
@@ -108,6 +135,14 @@ export class UserService {
 
     session.expires_at = new Date(Date.now() + 3600 * 1000); // Extend session by 1 hour
     return this.sessionRepository.save(session);
+  }
+
+  async deleteExpiredSessions(): Promise<void> {
+    console.log('Deleting expired sessions...');
+    await this.sessionRepository.delete({
+      expires_at: LessThan(new Date()),
+    });
+    console.log('Expired sessions deleted.');
   }
 
   async getUserProfile(userId: number): Promise<User> {

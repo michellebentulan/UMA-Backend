@@ -21,10 +21,18 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   // Step 1: Create Account
+  // @Post('create-account')
+  // async createAccount(@Body() userData: Partial<User>) {
+  //   console.log('Creating user account:', userData);
+  //   return this.userService.createAccount(userData);
+  // }
   @Post('create-account')
   async createAccount(@Body() userData: Partial<User>) {
     console.log('Creating user account:', userData);
-    return this.userService.createAccount(userData);
+    const { user, sessionToken } =
+      await this.userService.createAccount(userData);
+    console.log('Created user:', user);
+    return { user, sessionToken };
   }
 
   // Step 2: Complete Profile
@@ -95,5 +103,11 @@ export class UserController {
     }
     console.log('Uploaded file:', file);
     return this.userService.updateProfileImage(userId, file.filename);
+  }
+
+  @Delete('delete-expired-sessions')
+  async deleteExpiredSessions() {
+    await this.userService.deleteExpiredSessions();
+    return { message: 'Expired sessions deleted successfully' };
   }
 }
