@@ -10,6 +10,7 @@ import { Session } from '../sessions/session.entity';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { LessThan } from 'typeorm';
+import { Location } from 'src/location/location.entity';
 
 @Injectable()
 export class UserService {
@@ -19,6 +20,9 @@ export class UserService {
 
     @InjectRepository(Session) // Inject Session repository
     private sessionRepository: Repository<Session>,
+
+    @InjectRepository(Location)
+    private locationRepository: Repository<Location>,
   ) {}
 
   // Step 1: Create Account
@@ -145,6 +149,20 @@ export class UserService {
     console.log('Expired sessions deleted.');
   }
 
+  // user.service.ts
+  async expireSessionInTwoMinutes(sessionToken: string): Promise<void> {
+    const session = await this.sessionRepository.findOne({
+      where: { session_token: sessionToken },
+    });
+
+    if (!session) {
+      throw new NotFoundException('Session not found');
+    }
+
+    session.expires_at = new Date(Date.now() + 2 * 60 * 1000); // Set to expire in 2 minutes
+    await this.sessionRepository.save(session);
+  }
+
   async getUserProfile(userId: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
@@ -152,6 +170,29 @@ export class UserService {
     }
     console.log('Fetched user profile:', user);
     return user;
+  }
+
+  async findUserLocation(userId: number): Promise<Location | null> {
+    // Find the user
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Find matching location
+    const location = await this.locationRepository.findOne({
+      where: {
+        town: user.town,
+        barangay: user.barangay,
+      },
+    });
+
+    if (!location) {
+      throw new NotFoundException('Location not found');
+    }
+
+    return location;
   }
 
   async getAllUsers(): Promise<User[]> {

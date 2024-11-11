@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UserModule } from './users/user.module'; // Adjust the path as necessary
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { LocationModule } from './location/location.module';
 import { join } from 'path'; // Import join to handle paths
 
 @Module({
@@ -23,6 +24,7 @@ import { join } from 'path'; // Import join to handle paths
     }),
     ScheduleModule.forRoot(),
     UserModule,
+    LocationModule,
   ],
 })
 export class AppModule {}

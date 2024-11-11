@@ -110,4 +110,10 @@ export class UserController {
     await this.userService.deleteExpiredSessions();
     return { message: 'Expired sessions deleted successfully' };
   }
+
+  @Put('expire-session')
+  async expireSessionInTwoMinutes(@Body('sessionToken') sessionToken: string) {
+    await this.userService.expireSessionInTwoMinutes(sessionToken);
+    return { message: 'Session will expire in 2 minutes' };
+  }
 }
