@@ -5,6 +5,8 @@ import { UserModule } from './users/user.module'; // Adjust the path as necessar
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { LocationModule } from './location/location.module';
 import { join } from 'path'; // Import join to handle paths
+import { LivestockController } from './livestock/livestock.controller';
+import { ImageRecognitionService } from './livestock/image-recognition.service';
 
 @Module({
   imports: [
@@ -26,5 +28,7 @@ import { join } from 'path'; // Import join to handle paths
     UserModule,
     LocationModule,
   ],
+  controllers: [LivestockController], // Add LivestockController here
+  providers: [ImageRecognitionService], // Add ImageRecognitionService here
 })
 export class AppModule {}
