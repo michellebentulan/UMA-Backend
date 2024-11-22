@@ -5,14 +5,21 @@ import { UserModule } from './users/user.module'; // Adjust the path as necessar
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { LocationModule } from './location/location.module';
 import { join } from 'path'; // Import join to handle paths
-import { LivestockController } from './livestock/livestock.controller';
-import { ImageRecognitionService } from './livestock/image-recognition.service';
+import { LivestockController } from './livestock-image-recognition/livestock.controller';
+import { ImageRecognitionService } from './livestock-image-recognition/image-recognition.service';
+import { LivestockListingModule } from './livestock-listings/livestock-listing.module';
+import { PriceSuggestionModule } from './price-suggestion/price-suggestion.module';
+import { AdminAccountModule } from './admin-account/admin-account.module';
+import { RequestedListingModule } from './requested-listing/requested-listing.module';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'), // Path to your 'uploads' folder
+      rootPath: join(__dirname, '..', '..', 'uploads'), // Path to your 'uploads' folder
       serveRoot: '/uploads', // This will be the base URL for accessing the images
+      serveStaticOptions: {
+        index: false, // Do not look for index.html
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'mysql', // Change this to your database type
@@ -27,6 +34,10 @@ import { ImageRecognitionService } from './livestock/image-recognition.service';
     ScheduleModule.forRoot(),
     UserModule,
     LocationModule,
+    LivestockListingModule,
+    RequestedListingModule,
+    PriceSuggestionModule,
+    AdminAccountModule,
   ],
   controllers: [LivestockController], // Add LivestockController here
   providers: [ImageRecognitionService], // Add ImageRecognitionService here

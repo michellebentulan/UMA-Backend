@@ -20,12 +20,6 @@ import { extname } from 'path';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // Step 1: Create Account
-  // @Post('create-account')
-  // async createAccount(@Body() userData: Partial<User>) {
-  //   console.log('Creating user account:', userData);
-  //   return this.userService.createAccount(userData);
-  // }
   @Post('create-account')
   async createAccount(@Body() userData: Partial<User>) {
     console.log('Creating user account:', userData);
