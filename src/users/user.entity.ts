@@ -7,6 +7,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Session } from 'src/sessions/session.entity';
+import { LivestockListing } from 'src/livestock-listings/livestock-listing.entity';
+import { RequestedListing } from '../requested-listing/requested-listing.entity';
 
 @Entity('users')
 export class User {
@@ -43,6 +45,12 @@ export class User {
   @Column({ length: 255, nullable: true })
   profile_image: string;
 
+  @Column({ default: false })
+  is_disabled: boolean;
+
+  @Column({ default: false })
+  is_banned: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -51,4 +59,10 @@ export class User {
 
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
+
+  @OneToMany(() => LivestockListing, (listing) => listing.user)
+  listings: LivestockListing[];
+
+  @OneToMany(() => RequestedListing, (listing) => listing.user)
+  requestedListings: RequestedListing[];
 }
