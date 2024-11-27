@@ -73,11 +73,11 @@ export class ImageRecognitionService {
     };
 
     const targetTags = livestockMap[selectedType.toLowerCase()] || [];
+    this.logger.log('Tags received from Imagga:', tags);
     return tags.some(
       (tag) => targetTags.includes(tag.tag.en) && tag.confidence > 50,
     );
   }
-
 
   isLivestock(tags: any[]): boolean {
     const livestockTags = ['cow', 'pig', 'goat', 'chicken', 'duck', 'carabao'];
