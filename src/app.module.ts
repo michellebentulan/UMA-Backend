@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  Module,
+  MiddlewareConsumer,
+  RequestMethod,
+  NestModule,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UserModule } from './users/user.module'; // Adjust the path as necessary
@@ -11,26 +16,33 @@ import { LivestockListingModule } from './livestock-listings/livestock-listing.m
 import { PriceSuggestionModule } from './price-suggestion/price-suggestion.module';
 import { AdminAccountModule } from './admin-account/admin-account.module';
 import { RequestedListingModule } from './requested-listing/requested-listing.module';
+import { ConversationsModule } from './conversations/conversations.module';
+import { MessagesModule } from './messages/messages.module';
+import { SessionService } from './sessions/session.service';
+import { SessionMiddleware } from './sessions/session.middleware';
+import { Session } from './sessions/session.entity';
+import { User } from './users/user.entity';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'uploads'), // Path to your 'uploads' folder
-      serveRoot: '/uploads', // This will be the base URL for accessing the images
+      rootPath: join(__dirname, '..', '..', 'uploads'),
+      serveRoot: '/uploads',
       serveStaticOptions: {
-        index: false, // Do not look for index.html
+        index: false,
       },
     }),
     TypeOrmModule.forRoot({
-      type: 'mysql', // Change this to your database type
+      type: 'mysql',
       host: 'localhost',
       port: 3306,
       username: 'uma',
       password: 'uma_password',
       database: 'uma_db',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Set to false in production
+      entities: [Session, User, __dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
     }),
+    TypeOrmModule.forFeature([Session, User]),
     ScheduleModule.forRoot(),
     UserModule,
     LocationModule,
@@ -38,8 +50,19 @@ import { RequestedListingModule } from './requested-listing/requested-listing.mo
     RequestedListingModule,
     PriceSuggestionModule,
     AdminAccountModule,
+    ConversationsModule,
+    MessagesModule,
   ],
-  controllers: [LivestockController], // Add LivestockController here
-  providers: [ImageRecognitionService], // Add ImageRecognitionService here
+  controllers: [LivestockController],
+  providers: [ImageRecognitionService, SessionService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(SessionMiddleware)
+      .forRoutes(
+        { path: 'conversations/*', method: RequestMethod.ALL },
+        { path: 'messages/*', method: RequestMethod.ALL },
+      );
+  }
+}

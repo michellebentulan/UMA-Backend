@@ -3,12 +3,15 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  ManyToMany,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Session } from 'src/sessions/session.entity';
 import { LivestockListing } from 'src/livestock-listings/livestock-listing.entity';
 import { RequestedListing } from '../requested-listing/requested-listing.entity';
+import { Message } from 'src/messages/entities/message.entity';
+import { Conversation } from 'src/conversations/entities/conversation.entity';
 
 @Entity('users')
 export class User {
@@ -65,4 +68,10 @@ export class User {
 
   @OneToMany(() => RequestedListing, (listing) => listing.user)
   requestedListings: RequestedListing[];
+
+  @ManyToMany(() => Conversation, (conversation) => conversation.participants)
+  conversations: Conversation[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  messages: Message[];
 }
