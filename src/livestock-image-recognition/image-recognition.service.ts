@@ -67,7 +67,7 @@ export class ImageRecognitionService {
       cow: ['cow', 'cattle'],
       pig: ['pig', 'hog'],
       goat: ['goat'],
-      chicken: ['chicken', 'hen'],
+      chicken: ['chicken', 'hen', 'cock'],
       duck: ['duck'],
       carabao: ['carabao', 'water buffalo'],
     };

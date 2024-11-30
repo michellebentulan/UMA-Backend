@@ -5,6 +5,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 
@@ -19,6 +20,9 @@ export class LivestockListing {
   @ManyToOne(() => User, (user) => user.listings)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToMany(() => LivestockListing, (listing) => listing.user)
+  listings: LivestockListing[];
 
   @Column({
     type: 'enum',
