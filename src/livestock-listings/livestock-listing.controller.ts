@@ -6,12 +6,15 @@ import {
   Param,
   UploadedFiles,
   UseInterceptors,
+  Delete,
+  NotFoundException,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { LivestockListingService } from './livestock-listing.service';
 import { multerConfig } from 'multer.config';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import * as path from 'path';
 
 @Controller('livestock-listings')
 export class LivestockListingController {
@@ -69,5 +72,21 @@ export class LivestockListingController {
   @Get(':id')
   async getListingById(@Param('id') id: number) {
     return this.listingService.getListingById(id);
+  }
+
+  @Delete(':id/:userId')
+  async deleteListing(
+    @Param('id') id: number,
+    @Param('userId') userId: number,
+  ) {
+    try {
+      await this.listingService.deleteListing(id, userId);
+      return { message: 'Listing deleted successfully' };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new Error('An error occurred while deleting the listing');
+    }
   }
 }

@@ -29,7 +29,11 @@ import { User } from './users/user.entity';
       rootPath: join(__dirname, '..', '..', 'uploads'),
       serveRoot: '/uploads',
       serveStaticOptions: {
-        index: false,
+        index: false, // Prevent searching for index.html
+        fallthrough: false, // Prevent express.static from trying to find other default paths if nothing matches
+        setHeaders: (res, path, stat) => {
+          res.set('Cache-Control', 'public, max-age=31536000');
+        },
       },
     }),
     TypeOrmModule.forRoot({
