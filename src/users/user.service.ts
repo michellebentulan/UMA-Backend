@@ -198,4 +198,8 @@ export class UserService {
   async getAllUsers(): Promise<User[]> {
     return this.userRepository.find(); // Fetch all users from the database
   }
+
+  async getUserCount(): Promise<number> {
+    return this.userRepository.count(); // Use the count method of TypeORM
+  }
 }

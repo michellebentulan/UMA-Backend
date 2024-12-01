@@ -22,6 +22,7 @@ import { SessionService } from './sessions/session.service';
 import { SessionMiddleware } from './sessions/session.middleware';
 import { Session } from './sessions/session.entity';
 import { User } from './users/user.entity';
+import { AdminAccount } from './admin-account/admin-account.entiity';
 
 @Module({
   imports: [
@@ -43,7 +44,12 @@ import { User } from './users/user.entity';
       username: 'uma',
       password: 'uma_password',
       database: 'uma_db',
-      entities: [Session, User, __dirname + '/**/*.entity{.ts,.js}'],
+      entities: [
+        Session,
+        User,
+        AdminAccount,
+        __dirname + '/**/*.entity{.ts,.js}',
+      ],
       synchronize: true,
     }),
     TypeOrmModule.forFeature([Session, User]),
