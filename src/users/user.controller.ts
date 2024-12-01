@@ -47,6 +47,11 @@ export class UserController {
     return this.userService.login(phoneNumber, password);
   }
 
+  @Get('count')
+  async getUserCount() {
+    return this.userService.getUserCount();
+  }
+
   @Get(':id')
   async getUserProfile(@Param('id') id: number) {
     return this.userService.getUserProfile(id);
