@@ -64,12 +64,12 @@ export class ImageRecognitionService {
 
     const normalizedType = selectedType.toLowerCase();
     const livestockMap = {
-      cow: ['cow', 'cattle'],
-      pig: ['pig', 'hog'],
+      cow: ['cow', 'cattle', 'calf', 'bull'],
+      pig: ['pig', 'hog', 'sow'],
       goat: ['goat'],
-      chicken: ['chicken', 'hen', 'cock'],
+      chicken: ['chicken', 'hen', 'cock', 'rooster'],
       duck: ['duck'],
-      carabao: ['carabao', 'water buffalo'],
+      carabao: ['carabao', 'water buffalo', 'buffalo'],
     };
 
     const targetTags = livestockMap[selectedType.toLowerCase()] || [];
