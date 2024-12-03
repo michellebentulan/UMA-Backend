@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Session } from '../sessions/session.entity';
 import { User } from '../users/user.entity';
+import { CreateMessageDto } from './dto/create-message.dto';
 
 @WebSocketGateway()
 export class MessageGateway
@@ -62,35 +63,35 @@ export class MessageGateway
     console.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('sendMessage')
-  handleMessage(client: Socket, payload: any): void {
-    if (!client.data.user) {
-      console.error('Unauthenticated client attempted to send a message');
-      return;
-    }
-
-    // Emit message to the specific room (conversation)
-    this.server.to(payload.conversationId).emit('receiveMessage', {
-      ...payload,
-      senderId: client.data.user.id, // Attach sender ID to the payload
-    });
-  }
-
   @SubscribeMessage('joinConversation')
   handleJoinConversation(client: Socket, conversationId: string | number) {
     if (!conversationId) {
       console.error('Invalid conversationId:', conversationId);
       return;
     }
-    {
-      console.error('Invalid conversationId:', conversationId);
-      return;
-    }
+    // {
+    //   console.error('Invalid conversationId:', conversationId);
+    //   return;
+    // }
 
     client.join(conversationId.toString()); // Convert to string to avoid room mismatch
     console.log(
       `User ${client.data.user?.id} joined conversation room: ${conversationId}`,
     );
+  }
+
+  @SubscribeMessage('sendMessage')
+  handleMessage(client: Socket, payload: CreateMessageDto): void {
+    if (!client.data.user) {
+      console.error('Unauthenticated client attempted to send a message');
+      return;
+    }
+
+    // Emit message to the specific room (conversation)
+    this.server.to(payload.conversationId.toString()).emit('newMessage', {
+      ...payload,
+      senderId: client.data.user.id, // Attach sender ID to the payload
+    });
   }
 
   @SubscribeMessage('typing')
